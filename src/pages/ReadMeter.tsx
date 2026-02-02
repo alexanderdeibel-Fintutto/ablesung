@@ -212,13 +212,9 @@ export default function ReadMeter() {
           .upload(fileName, imageFile);
 
         if (!uploadError) {
-          // Use signed URL since bucket is private
-          const { data, error: signError } = await supabase.storage
-            .from('meter-photos')
-            .createSignedUrl(fileName, 31536000); // 1 year expiry
-          if (!signError && data) {
-            imageUrl = data.signedUrl;
-          }
+          // Store only the file path - signed URLs will be generated on-demand
+          // This ensures RLS is re-evaluated each time image is accessed
+          imageUrl = fileName;
         }
       }
 

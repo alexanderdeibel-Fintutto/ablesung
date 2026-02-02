@@ -6,6 +6,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Valid meter types for validation
+const VALID_METER_TYPES = ['electricity', 'gas', 'cold_water', 'warm_water', 'heating'];
+
+// Max image size: 10MB
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -16,7 +22,7 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Nicht autorisiert' }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -31,20 +37,65 @@ serve(async (req) => {
     const { data: claimsData, error: authError } = await supabaseClient.auth.getClaims(token);
     if (authError || !claimsData?.claims) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Nicht autorisiert' }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const { image, meterType } = await req.json();
+    // Parse and validate request body
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Ungültige Anfrage' }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { image, meterType } = body;
     
-    if (!image) {
-      throw new Error("No image provided");
+    // Validate image exists and is a string
+    if (!image || typeof image !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Ungültige Bilddaten' }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate base64 image format
+    if (!/^data:image\/(jpeg|jpg|png|webp);base64,/.test(image)) {
+      return new Response(
+        JSON.stringify({ error: 'Nur JPEG, PNG und WebP Bilder werden unterstützt' }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check image size (base64 is ~4/3 of original size)
+    const base64Data = image.split(',')[1];
+    const sizeInBytes = (base64Data.length * 3) / 4;
+    if (sizeInBytes > MAX_IMAGE_SIZE_BYTES) {
+      return new Response(
+        JSON.stringify({ error: 'Bild zu groß. Maximum 10MB.' }),
+        { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate meterType if provided
+    if (meterType && !VALID_METER_TYPES.includes(meterType)) {
+      return new Response(
+        JSON.stringify({ error: 'Ungültiger Zählertyp' }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: 'Die Verarbeitung ist fehlgeschlagen. Bitte versuchen Sie es später erneut.' }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Get meter type context
@@ -124,14 +175,21 @@ Beispiel für einen Zähler mit Anzeige "12345.6":
         );
       }
       
-      throw new Error("AI gateway error");
+      return new Response(
+        JSON.stringify({ error: "Die Verarbeitung ist fehlgeschlagen. Bitte versuchen Sie es erneut." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
-      throw new Error("No response from AI");
+      console.error("No response content from AI");
+      return new Response(
+        JSON.stringify({ error: "Die Verarbeitung ist fehlgeschlagen. Bitte versuchen Sie es erneut." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // Parse the JSON response
@@ -146,7 +204,10 @@ Beispiel für einen Zähler mit Anzeige "12345.6":
       }
     } catch (parseError) {
       console.error("Failed to parse OCR response:", content);
-      throw new Error("Invalid OCR response format");
+      return new Response(
+        JSON.stringify({ error: "Die Verarbeitung ist fehlgeschlagen. Bitte versuchen Sie es erneut." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     if (result.value === null || result.value === undefined) {
@@ -164,11 +225,11 @@ Beispiel für einen Zähler mit Anzeige "12345.6":
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    // Log detailed error server-side only
     console.error("OCR error:", error);
+    // Return generic error to client
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "OCR-Verarbeitung fehlgeschlagen" 
-      }),
+      JSON.stringify({ error: "Die Verarbeitung ist fehlgeschlagen. Bitte versuchen Sie es erneut." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
