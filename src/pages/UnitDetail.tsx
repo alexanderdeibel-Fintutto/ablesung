@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MeterIcon } from '@/components/meters/MeterIcon';
+import { MeterNumberScanner } from '@/components/meters/MeterNumberScanner';
 import { useBuildings } from '@/hooks/useBuildings';
 import { useToast } from '@/hooks/use-toast';
 import { METER_TYPE_LABELS, METER_TYPE_UNITS, MeterType } from '@/types/database';
@@ -239,6 +240,14 @@ export default function UnitDetail() {
                 placeholder="z.B. 1234567890"
                 value={meterNumber}
                 onChange={(e) => setMeterNumber(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Nummer scannen</Label>
+              <MeterNumberScanner
+                onNumberDetected={setMeterNumber}
+                disabled={addingMeter}
               />
             </div>
           </div>
