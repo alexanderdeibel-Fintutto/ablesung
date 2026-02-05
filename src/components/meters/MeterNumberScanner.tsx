@@ -151,8 +151,8 @@ export function MeterNumberScanner({ onNumberDetected, disabled }: MeterNumberSc
       <input
         id={cameraInputId}
         type="file"
-        accept="image/*"
-        capture="environment"
+        accept="image/jpeg,image/png,image/webp"
+        capture
         onChange={handleFileChange}
         className="sr-only"
         disabled={disabled || scanning}
