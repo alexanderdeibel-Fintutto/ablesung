@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Camera, Building2, LogOut, Zap } from 'lucide-react';
+import { Home, Camera, LogOut, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,6 @@ interface AppLayoutProps {
 const navItems = [
   { href: '/', icon: Home, label: 'Dashboard' },
   { href: '/read', icon: Camera, label: 'Ablesen' },
-  { href: '/units', icon: Building2, label: 'Einheiten' },
 ];
 
 export function AppLayout({ children, title, showBack }: AppLayoutProps) {
