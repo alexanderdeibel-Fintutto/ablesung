@@ -6,8 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Valid meter types for validation
-const VALID_METER_TYPES = ['electricity', 'gas', 'cold_water', 'warm_water', 'heating'];
+// Valid meter types for validation (match database enum)
+const VALID_METER_TYPES = ['electricity', 'gas', 'water_cold', 'water_hot', 'heating'];
 
 // Max image size: 10MB
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -33,9 +33,9 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const token = authHeader.replace('Bearer ', '');
-    const { data: claimsData, error: authError } = await supabaseClient.auth.getClaims(token);
-    if (authError || !claimsData?.claims) {
+    const { data: userData, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !userData?.user) {
+      console.error('Auth error:', authError);
       return new Response(
         JSON.stringify({ error: 'Nicht autorisiert' }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -102,8 +102,8 @@ serve(async (req) => {
     const meterTypeDescriptions: Record<string, string> = {
       electricity: "Stromzähler (kWh)",
       gas: "Gaszähler (m³)",
-      cold_water: "Kaltwasserzähler (m³)",
-      warm_water: "Warmwasserzähler (m³)",
+      water_cold: "Kaltwasserzähler (m³)",
+      water_hot: "Warmwasserzähler (m³)",
       heating: "Heizungszähler (kWh)",
     };
     
