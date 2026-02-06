@@ -196,11 +196,18 @@ div[style*="background-color: rgb(229, 227, 223)"] {
 
   /* Mesh gradient background */
   .gradient-mesh {
-    background: 
-      radial-gradient(ellipse at 20% 30%, hsl(var(--primary) / 0.3) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 70%, hsl(var(--secondary) / 0.25) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, hsl(var(--accent) / 0.2) 0%, transparent 60%),
-      hsl(var(--background));
+    background: linear-gradient(
+      135deg,
+      #0f0f1a 0%,
+      #1a1030 12%,
+      #2d1850 25%,
+      #3a2068 38%,
+      #3a3888 50%,
+      #3058a0 62%,
+      #2088b8 75%,
+      #38c0d0 88%,
+      #50E8E8 100%
+    );
   }
 
   /* Animated gradient */
