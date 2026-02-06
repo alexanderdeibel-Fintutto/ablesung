@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, Camera, Loader2 } from 'lucide-react';
+import { Plus, Camera, Loader2, Building2, ChevronRight, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { UnitCard } from '@/components/dashboard/UnitCard';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useBuildings } from '@/hooks/useBuildings';
 import { useProfile } from '@/hooks/useProfile';
 import { CrossMarketingBanner } from '@/components/dashboard/CrossMarketingBanner';
@@ -122,9 +123,9 @@ export default function Dashboard() {
         </motion.div>
       </motion.div>
 
-      {/* Units from all buildings */}
+      {/* Buildings Overview */}
       <AnimatePresence mode="wait">
-        {allUnits.length === 0 ? (
+        {buildings.length === 0 ? (
           <motion.div 
             key="empty"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -136,11 +137,11 @@ export default function Dashboard() {
               whileHover={{ scale: 1.05, rotate: 5 }}
               className="w-20 h-20 rounded-3xl bg-gradient-to-br from-accent to-accent/50 mx-auto mb-5 flex items-center justify-center shadow-soft"
             >
-              <Plus className="w-10 h-10 text-muted-foreground" />
+              <Building2 className="w-10 h-10 text-muted-foreground" />
             </motion.div>
-            <h2 className="text-xl font-bold mb-2">Keine Einheiten</h2>
+            <h2 className="text-xl font-bold mb-2">Keine Gebäude</h2>
             <p className="text-muted-foreground mb-6 max-w-xs mx-auto">
-              Legen Sie zuerst ein Gebäude an, um Einheiten zu verwalten.
+              Legen Sie Ihr erstes Gebäude an, um Einheiten und Zähler zu verwalten.
             </p>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button 
@@ -160,18 +161,72 @@ export default function Dashboard() {
             animate="show"
             className="space-y-4"
           >
-            {allUnits.map((unit, index) => (
+            {/* Section: Buildings */}
+            <motion.div variants={itemVariants} className="mb-2">
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                Meine Gebäude ({buildings.length})
+              </h2>
+            </motion.div>
+
+            {buildings.map((building, index) => (
               <motion.div
-                key={unit.id}
+                key={building.id}
                 variants={itemVariants}
                 transition={{ delay: index * 0.05 }}
               >
-                <UnitCard 
-                  unit={unit} 
-                  onAddReading={handleAddReading}
-                />
+                <Card 
+                  className="glass-card border-0 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => navigate(`/units?building=${building.id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shrink-0">
+                        <Building2 className="w-6 h-6 text-primary-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-foreground truncate">{building.name}</h3>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {building.address && `${building.address}, `}{building.city || 'Keine Adresse'}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Home className="w-3 h-3" />
+                            {building.units.length} Einheit{building.units.length !== 1 ? 'en' : ''}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+                    </div>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
+
+            {/* Section: Units with Meters */}
+            {allUnits.length > 0 && (
+              <>
+                <motion.div variants={itemVariants} className="mt-6 mb-2">
+                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                    <Home className="w-4 h-4" />
+                    Einheiten mit Zählern
+                  </h2>
+                </motion.div>
+
+                {allUnits.filter(unit => unit.meters.length > 0).map((unit, index) => (
+                  <motion.div
+                    key={unit.id}
+                    variants={itemVariants}
+                    transition={{ delay: (buildings.length + index) * 0.05 }}
+                  >
+                    <UnitCard 
+                      unit={unit} 
+                      onAddReading={handleAddReading}
+                    />
+                  </motion.div>
+                ))}
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
