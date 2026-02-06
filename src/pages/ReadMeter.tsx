@@ -50,6 +50,7 @@ export default function ReadMeter() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showCamera, setShowCamera] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [cameraReady, setCameraReady] = useState(false);
 
   // Set selected unit based on meter
   useEffect(() => {
@@ -70,36 +71,59 @@ export default function ReadMeter() {
     };
   }, [stream]);
 
+  // Connect stream to video element when both are available - critical for iOS Safari
+  useEffect(() => {
+    if (showCamera && stream && videoRef.current) {
+      const video = videoRef.current;
+      
+      // Set srcObject
+      video.srcObject = stream;
+      
+      // iOS Safari requires explicit play call
+      const playVideo = async () => {
+        try {
+          await video.play();
+          setCameraReady(true);
+        } catch (err) {
+          console.error('Failed to play video:', err);
+          // Try again after a short delay
+          setTimeout(async () => {
+            try {
+              await video.play();
+              setCameraReady(true);
+            } catch (retryErr) {
+              console.error('Retry play failed:', retryErr);
+            }
+          }, 500);
+        }
+      };
+      
+      playVideo();
+    }
+  }, [showCamera, stream]);
+
   const selectedUnit = units.find(u => u.id === selectedUnitId);
   const selectedMeter = selectedUnit?.meters.find(m => m.id === selectedMeterId);
 
   const startCamera = async () => {
+    setCameraReady(false);
+    setShowCamera(true); // Show camera UI first
+    
+    // Small delay to ensure video element is mounted
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { 
-          facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         }
       });
       setStream(mediaStream);
-      setShowCamera(true);
-      
-      // Wait for next tick to ensure video element is mounted
-      setTimeout(async () => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-          
-          // Explicitly play the video - important for mobile
-          try {
-            await videoRef.current.play();
-          } catch (playError) {
-            console.error('Video play error:', playError);
-          }
-        }
-      }, 100);
     } catch (error) {
       console.error('Camera access error:', error);
+      setShowCamera(false);
       toast({
         variant: 'destructive',
         title: 'Kamera-Fehler',
@@ -139,6 +163,7 @@ export default function ReadMeter() {
       setStream(null);
     }
     setShowCamera(false);
+    setCameraReady(false);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,21 +372,33 @@ export default function ReadMeter() {
               const video = e.currentTarget;
               video.play().catch(console.error);
             }}
+            onCanPlay={() => setCameraReady(true)}
             className="absolute inset-0 w-full h-full object-cover"
           />
           
-          {/* Viewfinder overlay */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div 
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-72 h-28 border-2 border-primary rounded-2xl shadow-glow"
-            />
-          </div>
+          {/* Loading overlay while camera initializes */}
+          {!cameraReady && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80">
+              <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+              <p className="text-white text-sm">Kamera wird gestartet...</p>
+            </div>
+          )}
+          
+          {/* Viewfinder overlay - only show when camera is ready */}
+          {cameraReady && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: [1, 1.02, 1], opacity: 1 }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="w-72 h-28 border-2 border-primary rounded-2xl shadow-glow"
+              />
+            </div>
+          )}
           
           <motion.p 
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: cameraReady ? 1 : 0 }}
             transition={{ delay: 0.5 }}
             className="absolute bottom-28 left-0 right-0 text-center text-white text-sm px-4"
           >
@@ -379,9 +416,19 @@ export default function ReadMeter() {
               size="lg" 
               className="w-full h-14 gradient-primary text-primary-foreground font-semibold rounded-2xl shadow-glow text-base"
               onClick={capturePhoto}
+              disabled={!cameraReady}
             >
-              <Camera className="w-5 h-5 mr-2" />
-              Foto aufnehmen
+              {!cameraReady ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Kamera lädt...
+                </>
+              ) : (
+                <>
+                  <Camera className="w-5 h-5 mr-2" />
+                  Foto aufnehmen
+                </>
+              )}
             </Button>
           </motion.div>
         </motion.div>
