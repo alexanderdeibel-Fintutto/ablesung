@@ -711,14 +711,21 @@ export default function ReadMeter() {
                     className="space-y-4"
                   >
                     <Label className="text-sm font-medium">Zählerstand eingeben</Label>
-                    <Input
-                      type="text"
-                      inputMode="decimal"
-                      value={editedValue}
-                      onChange={(e) => setEditedValue(e.target.value)}
-                      placeholder="z.B. 12345.67"
-                      className="h-14 text-2xl font-bold text-center rounded-xl border-border/50 bg-background/50"
-                    />
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        value={editedValue}
+                        onChange={(e) => setEditedValue(e.target.value)}
+                        placeholder="12345.67"
+                        className="h-14 text-2xl font-bold text-center rounded-xl border-border/50 bg-background/50 placeholder:text-muted-foreground/40 placeholder:font-normal"
+                      />
+                      {!editedValue && (
+                        <p className="absolute top-1 left-1/2 -translate-x-1/2 text-xs text-muted-foreground">
+                          Zählerstand hier eingeben
+                        </p>
+                      )}
+                    </div>
                     <p className="text-center text-sm text-muted-foreground">
                       {METER_TYPE_UNITS[selectedMeter.meter_type]}
                     </p>
