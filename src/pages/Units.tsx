@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Building2, ChevronRight, Loader2, Trash2, Home } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Plus, Building2, ChevronRight, Loader2, Trash2, Home, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,14 +33,26 @@ const itemVariants = {
 
 export default function Units() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const buildingId = searchParams.get('building');
   const { buildings, isLoading, deleteUnit } = useBuildings();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Flatten all units across buildings
-  const allUnits = buildings.flatMap(b => 
-    b.units.map(u => ({ ...u, building: b }))
-  );
+  // Find the selected building
+  const selectedBuilding = buildingId 
+    ? buildings.find(b => b.id === buildingId) 
+    : null;
+
+  // Get units - filtered by building if specified, otherwise all units
+  const allUnits = useMemo(() => {
+    if (buildingId && selectedBuilding) {
+      return selectedBuilding.units.map(u => ({ ...u, building: selectedBuilding }));
+    }
+    return buildings.flatMap(b => 
+      b.units.map(u => ({ ...u, building: b }))
+    );
+  }, [buildings, buildingId, selectedBuilding]);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -61,20 +73,62 @@ export default function Units() {
     setDeleteId(null);
   };
 
+  const pageTitle = selectedBuilding ? selectedBuilding.name : "Einheiten";
+
   return (
-    <AppLayout title="Einheiten">
+    <AppLayout title={pageTitle}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
+        {/* Back button when viewing a specific building */}
+        {selectedBuilding && (
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-4"
+          >
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="text-muted-foreground hover:text-foreground -ml-2"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Zurück zur Übersicht
+            </Button>
+          </motion.div>
+        )}
+
+        {/* Building info when filtering */}
+        {selectedBuilding && (
+          <Card className="glass-card border-0 mb-4">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div>
+                  <h2 className="font-semibold">{selectedBuilding.name}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedBuilding.address && `${selectedBuilding.address}, `}{selectedBuilding.city || 'Keine Adresse'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button 
             className="w-full mb-6 gradient-primary text-primary-foreground font-semibold py-6 rounded-2xl shadow-glow text-base"
-            onClick={() => navigate('/buildings/new')}
+            onClick={() => selectedBuilding 
+              ? navigate(`/units/new?building=${selectedBuilding.id}`) 
+              : navigate('/buildings/new')
+            }
           >
             <Plus className="w-5 h-5 mr-2" />
-            Neues Gebäude anlegen
+            {selectedBuilding ? 'Neue Einheit anlegen' : 'Neues Gebäude anlegen'}
           </Button>
         </motion.div>
       </motion.div>
@@ -107,7 +161,9 @@ export default function Units() {
           </motion.div>
           <h2 className="text-xl font-bold mb-2">Keine Einheiten</h2>
           <p className="text-muted-foreground max-w-xs mx-auto">
-            Legen Sie zuerst ein Gebäude an, um Einheiten zu verwalten.
+            {selectedBuilding 
+              ? `Legen Sie die erste Einheit für "${selectedBuilding.name}" an.`
+              : 'Legen Sie zuerst ein Gebäude an, um Einheiten zu verwalten.'}
           </p>
         </motion.div>
       ) : (
