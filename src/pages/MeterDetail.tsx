@@ -34,10 +34,14 @@ export default function MeterDetail() {
   const [deleteReadingData, setDeleteReadingData] = useState<MeterReading | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Find meter across all buildings/units
+  // Find meter across all buildings/units (including building-level meters)
   const allUnits = buildings.flatMap(b => b.units);
-  const meter = allUnits.flatMap(u => u.meters).find(m => m.id === id);
+  const unitMeter = allUnits.flatMap(u => u.meters).find(m => m.id === id);
+  const buildingMeter = buildings.flatMap(b => b.meters || []).find(m => m.id === id);
+  const meter = unitMeter || buildingMeter;
   const unit = allUnits.find(u => u.meters.some(m => m.id === id));
+  const building = buildings.find(b => (b.meters || []).some(m => m.id === id)) || 
+                   buildings.find(b => b.units.some(u => u.meters.some(m => m.id === id)));
   
   // Get existing reading dates for duplicate detection
   const existingDates = meter?.readings.map(r => r.reading_date) || [];
@@ -73,7 +77,7 @@ export default function MeterDetail() {
     );
   }
 
-  if (!meter || !unit) {
+  if (!meter) {
     return (
       <AppLayout>
         <div className="text-center py-12">
@@ -108,7 +112,7 @@ export default function MeterDetail() {
       <Button
         variant="ghost"
         className="mb-4 -ml-2"
-        onClick={() => navigate(`/units/${unit.id}`)}
+        onClick={() => unit ? navigate(`/units/${unit.id}`) : building ? navigate(`/buildings/${building.id}`) : navigate('/')}
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Zurück
@@ -127,7 +131,7 @@ export default function MeterDetail() {
                 Nr. {meter.meter_number}
               </p>
               <p className="text-sm text-muted-foreground">
-                {unit.unit_number}
+                {unit ? unit.unit_number : building?.name || 'Gebäudezähler'}
               </p>
             </div>
             <div className="flex gap-2">
