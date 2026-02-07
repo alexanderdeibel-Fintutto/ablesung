@@ -8,3 +8,15 @@ verify_jwt = false
 
 [functions.customer-portal]
 verify_jwt = false
+
+[functions.ocr-meter-number]
+verify_jwt = false
+
+[functions.ocr-meter]
+verify_jwt = false
+
+[functions.parse-meter-import]
+verify_jwt = false
+
+[functions.get-maps-key]
+verify_jwt = false
