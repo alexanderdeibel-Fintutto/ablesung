@@ -31,7 +31,7 @@ export function AppLayout({ children, title, showBack }: AppLayoutProps) {
         className="sticky top-0 z-50 glass border-b border-border/50 px-4 py-3 safe-area-pt"
       >
         <div className="flex items-center justify-between max-w-lg mx-auto">
-          <Link to="/" className="flex items-center gap-2.5 group">
+          <Link to="/dashboard" className="flex items-center gap-2.5 group">
             <motion.div 
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}

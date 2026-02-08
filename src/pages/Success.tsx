@@ -57,7 +57,7 @@ export default function Success() {
           <div className="space-y-3">
             <Button 
               className="w-full" 
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/dashboard')}
             >
               Zum Dashboard
             </Button>
