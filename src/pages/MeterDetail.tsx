@@ -123,7 +123,7 @@ export default function MeterDetail() {
       <AppLayout>
         <div className="text-center py-12">
           <p className="text-muted-foreground">Zähler nicht gefunden.</p>
-          <Button variant="link" onClick={() => navigate('/')}>
+          <Button variant="link" onClick={() => navigate('/dashboard')}>
             Zurück zur Übersicht
           </Button>
         </div>
@@ -203,7 +203,7 @@ export default function MeterDetail() {
       <Button
         variant="ghost"
         className="mb-4 -ml-2"
-        onClick={() => unit ? navigate(`/units/${unit.id}`) : building ? navigate(`/buildings/${building.id}`) : navigate('/')}
+        onClick={() => unit ? navigate(`/units/${unit.id}`) : building ? navigate(`/buildings/${building.id}`) : navigate('/dashboard')}
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Zurück

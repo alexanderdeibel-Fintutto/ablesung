@@ -162,7 +162,7 @@ export default function BuildingDetail() {
         <div className="text-center py-12">
           <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Gebäude nicht gefunden</h2>
-          <Button onClick={() => navigate('/')} variant="outline">
+          <Button onClick={() => navigate('/dashboard')} variant="outline">
             Zurück zur Übersicht
           </Button>
         </div>
@@ -185,7 +185,7 @@ export default function BuildingDetail() {
         >
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="text-muted-foreground hover:text-foreground -ml-2"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

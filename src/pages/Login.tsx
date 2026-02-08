@@ -32,7 +32,7 @@ export default function Login() {
           : error.message,
       });
     } else {
-      navigate('/');
+      navigate('/dashboard');
     }
 
     setLoading(false);
