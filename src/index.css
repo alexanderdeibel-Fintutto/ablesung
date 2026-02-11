@@ -12,6 +12,12 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
 
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Text&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
+
 /* Hide Google Maps "Are you the owner of this website?" prompt */
 .pac-container .pac-item-query + .pac-item-query,
 .pac-container::after,
@@ -32,29 +38,29 @@ div[style*="background-color: rgb(229, 227, 223)"] {
   :root {
     /* Fintutto Vibrant Yellow/Orange Theme */
     --background: 0 0% 98%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 234 16% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 234 16% 15%;
 
-    --popover: 260 30% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 234 16% 15%;
 
     /* Primary: Vibrant Yellow #FACC15 -> HSL 48 96% 53% */
-    --primary: 243 75% 59%;
+    --primary: 239 84% 58%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 45 100% 60%;
 
     /* Secondary: Vibrant Orange #F97316 -> HSL 25 95% 53% */
-    --secondary: 263 70% 58%;
+    --secondary: 263 70% 50%;
     --secondary-foreground: 0 0% 100%;
     --secondary-glow: 20 100% 60%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
 
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --accent: 263 70% 50%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -62,9 +68,9 @@ div[style*="background-color: rgb(229, 227, 223)"] {
     --success: 160 84% 39%;
     --success-foreground: 0 0% 100%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 243 75% 59%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 239 84% 67%;
 
     --radius: 0.75rem;
 
@@ -81,27 +87,27 @@ div[style*="background-color: rgb(229, 227, 223)"] {
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 243 75% 59%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 243 75% 59%;
+    --sidebar-ring: 239 84% 67%;
     --chart-1: 27 95% 60%;
     --chart-2: 43 96% 56%;
     --chart-3: 47 95% 53%;
     --chart-4: 24 94% 53%;
     --chart-5: 0 0% 45%;
     --sidebar: 0 0% 98%;
-    --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --font-serif: 'Libre Caslon Text', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-    --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --font-sans: Roboto, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: "Crimson Text", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+    --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-sm: 0px 1px 1.5px 0px hsla(0, 0%, 0%, 0.1);
+    --shadow: 0px 1px 3px 0px hsla(0, 0%, 0%, 0.1);
+    --shadow-md: 0px 1px 4.5px 0px hsla(0, 0%, 0%, 0.1);
+    --shadow-lg: 0px 1px 7.5px 0px hsla(0, 0%, 0%, 0.1);
     --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --tracking-normal: 0em;
@@ -118,7 +124,7 @@ div[style*="background-color: rgb(229, 227, 223)"] {
     --accent-sky-foreground: 0 0% 100%;
     --accent-amber: 38 92% 50%;
     --accent-amber-foreground: 0 0% 100%;
-    --gradient-primary: linear-gradient(135deg, hsl(243, 75%, 59%) 0%, hsl(263, 70%, 58%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(239, 84%, 67%) 0%, hsl(263, 70%, 50%) 100%);
     --gradient-mint: linear-gradient(135deg, hsl(158, 64%, 52%) 0%, hsl(168, 70%, 45%) 100%);
     --gradient-coral: linear-gradient(135deg, hsl(16, 85%, 66%) 0%, hsl(6, 80%, 58%) 100%);
     --gradient-sky: linear-gradient(135deg, hsl(199, 89%, 48%) 0%, hsl(209, 85%, 55%) 100%);
@@ -127,53 +133,58 @@ div[style*="background-color: rgb(229, 227, 223)"] {
                      radial-gradient(at 80% 0%, hsl(263, 70%, 58%) 0px, transparent 50%),
                      radial-gradient(at 0% 50%, hsl(199, 89%, 48%) 0px, transparent 50%);
     --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --yield-excellent: 160 84% 39%;
+    --yield-good: 142 71% 45%;
+    --yield-ok: 48 96% 53%;
+    --yield-weak: 38 92% 50%;
+    --yield-bad: 0 84% 60%;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
+    --background: 234 16% 10%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
+    --card: 234 16% 13%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 3.9%;
+    --popover: 234 16% 13%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 243 75% 59%;
+    --primary: 239 84% 58%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 45 100% 60%;
 
-    --secondary: 263 70% 58%;
+    --secondary: 263 70% 55%;
     --secondary-foreground: 0 0% 100%;
     --secondary-glow: 20 100% 60%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 234 16% 18%;
+    --muted-foreground: 240 5% 65%;
 
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 263 70% 55%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
 
     --success: 160 84% 39%;
     --success-foreground: 0 0% 100%;
 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 243 75% 59%;
+    --border: 234 16% 20%;
+    --input: 234 16% 20%;
+    --ring: 239 84% 67%;
 
     --glass-bg: 25 15% 12% / 0.8;
     --glass-border: 45 30% 95% / 0.1;
 
-    --sidebar-background: 240 5.9% 10%;
+    --sidebar-background: 234 16% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 243 75% 59%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent: 234 16% 15%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 243 75% 59%;
+    --sidebar-border: 234 16% 20%;
+    --sidebar-ring: 239 84% 67%;
     --chart-1: 30 97% 72%;
     --chart-2: 45 96% 64%;
     --chart-3: 48 96% 76%;
@@ -182,10 +193,10 @@ div[style*="background-color: rgb(229, 227, 223)"] {
     --sidebar: 0 0% 14%;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-sm: 0px 1px 1.5px 0px hsla(0, 0%, 0%, 0.1);
+    --shadow: 0px 1px 3px 0px hsla(0, 0%, 0%, 0.1);
+    --shadow-md: 0px 1px 4.5px 0px hsla(0, 0%, 0%, 0.1);
+    --shadow-lg: 0px 1px 7.5px 0px hsla(0, 0%, 0%, 0.1);
     --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --warning: 38 92% 50%;
@@ -200,6 +211,14 @@ div[style*="background-color: rgb(229, 227, 223)"] {
     --accent-sky-foreground: 0 0% 100%;
     --accent-amber: 38 92% 45%;
     --accent-amber-foreground: 0 0% 100%;
+    --yield-excellent: 160 84% 45%;
+    --yield-good: 142 71% 50%;
+    --yield-ok: 48 96% 58%;
+    --yield-weak: 38 92% 55%;
+    --yield-bad: 0 84% 55%;
+    --font-sans: Roboto, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    --font-serif: "Crimson Text", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
   }
 }
 
