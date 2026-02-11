@@ -229,20 +229,11 @@ div[style*="background-color: rgb(229, 227, 223)"] {
     background: linear-gradient(135deg, hsl(var(--primary-glow)) 0%, hsl(var(--secondary-glow)) 100%);
   }
 
-  /* Mesh gradient background */
+  /* Mesh gradient background – radial glow from bottom center */
   .gradient-mesh {
-    background: linear-gradient(
-      135deg,
-      #0f0f1a 0%,
-      #1a1030 12%,
-      #2d1850 25%,
-      #3a2068 38%,
-      #3a3888 50%,
-      #3058a0 62%,
-      #2088b8 75%,
-      #38c0d0 88%,
-      #50E8E8 100%
-    );
+    background: 
+      radial-gradient(ellipse 80% 50% at 50% 100%, rgba(138, 152, 240, 0.45) 0%, transparent 60%),
+      linear-gradient(180deg, #0f0f1a 0%, #1a1030 20%, #2d1850 45%, #3a2068 65%, #4a3088 100%);
   }
 
   /* Animated gradient */
@@ -267,13 +258,10 @@ div[style*="background-color: rgb(229, 227, 223)"] {
   }
 
   .glass-card {
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid hsl(var(--glass-border));
-    box-shadow: 
-      0 4px 24px -4px hsl(var(--primary) / 0.1),
-      0 0 0 1px hsl(var(--border) / 0.5);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   /* Elevated card with glow */
