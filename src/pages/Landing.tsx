@@ -58,11 +58,9 @@ const fadeUp = {
 
 export default function Landing() {
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen overflow-hidden gradient-mesh">
       {/* ── Hero ── */}
       <section className="relative min-h-[90vh] flex flex-col">
-        {/* Background */}
-        <div className="absolute inset-0 gradient-mesh" />
         <motion.div
           animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
@@ -153,19 +151,12 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Wave divider */}
-        <div className="relative z-10">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-            <path
-              d="M0 60L48 52C96 44 192 28 288 24C384 20 480 28 576 40C672 52 768 68 864 72C960 76 1056 68 1152 56C1248 44 1344 28 1392 20L1440 12V120H0V60Z"
-              className="fill-background"
-            />
-          </svg>
-        </div>
+        {/* Divider line */}
+        <div className="relative z-10 h-px bg-white/5" />
       </section>
 
       {/* ── Features ── */}
-      <section className="py-20 px-6 bg-background">
+      <section className="py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="hidden"
@@ -175,11 +166,11 @@ export default function Landing() {
             custom={0}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white">
               Alles, was Sie für Ihre{' '}
               <span className="text-gradient">Zählerverwaltung</span> brauchen
             </h2>
-            <p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="mt-4 text-white/60 text-lg max-w-2xl mx-auto">
               Von der einzelnen Wohnung bis zum großen Portfolio – Fintutto Zähler
               skaliert mit Ihren Anforderungen.
             </p>
@@ -199,10 +190,10 @@ export default function Landing() {
                 <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mb-4 shadow-glow group-hover:scale-110 transition-transform">
                   <feature.icon className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+                <p className="text-white/50 text-sm leading-relaxed">
                   {feature.description}
                 </p>
               </motion.div>
@@ -226,13 +217,13 @@ export default function Landing() {
             custom={0}
             className="relative z-10"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-8">
               Bereit für die digitale Zählerablesung?
             </h2>
 
             <ul className="grid sm:grid-cols-2 gap-4 text-left max-w-lg mx-auto mb-10">
               {benefits.map((benefit) => (
-                <li key={benefit} className="flex items-center gap-2 text-foreground">
+                <li key={benefit} className="flex items-center gap-2 text-white/80">
                   <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                   <span className="text-sm">{benefit}</span>
                 </li>
@@ -250,7 +241,7 @@ export default function Landing() {
               </Link>
             </Button>
 
-            <p className="mt-4 text-muted-foreground text-sm">
+            <p className="mt-4 text-white/40 text-sm">
               Keine Kreditkarte erforderlich · Sofort einsatzbereit
             </p>
           </motion.div>
@@ -258,19 +249,19 @@ export default function Landing() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="py-10 px-6 border-t border-border">
+      <footer className="py-10 px-6 border-t border-white/5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <img src={appLogo} alt="Fintutto Logo" className="w-8 h-8 rounded-lg" />
-            <span className="text-sm font-medium text-muted-foreground">
+            <span className="text-sm font-medium text-white/40">
               © {new Date().getFullYear()} Fintutto
             </span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link to="/login" className="hover:text-foreground transition-colors">
+          <div className="flex items-center gap-6 text-sm text-white/40">
+            <Link to="/login" className="hover:text-white transition-colors">
               Anmelden
             </Link>
-            <Link to="/register" className="hover:text-foreground transition-colors">
+            <Link to="/register" className="hover:text-white transition-colors">
               Registrieren
             </Link>
           </div>

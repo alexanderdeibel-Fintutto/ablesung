@@ -67,7 +67,7 @@ export function AppLayout({ children, title, showBack }: AppLayoutProps) {
             <motion.h1 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-2xl font-bold text-foreground mb-5"
+              className="text-2xl font-bold text-white mb-5"
             >
               {title}
             </motion.h1>
