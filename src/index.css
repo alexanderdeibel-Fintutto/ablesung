@@ -232,8 +232,8 @@ div[style*="background-color: rgb(229, 227, 223)"] {
   /* Mesh gradient background – radial glow from bottom center */
   .gradient-mesh {
     background: 
-      radial-gradient(circle at 50% 100%, rgba(138, 152, 240, 0.5) 0%, transparent 45%),
-      linear-gradient(180deg, #0f0f1a 0%, #1a1030 20%, #2d1850 45%, #3a2068 65%, #4a3088 100%);
+      radial-gradient(circle at 50% 100%, rgba(160, 140, 255, 0.6) 0%, rgba(106, 48, 128, 0.3) 25%, transparent 50%),
+      linear-gradient(180deg, #0f0f1a 0%, #1a1030 15%, #2d1850 35%, #6a3080 55%, #4a3088 75%, #2d1850 90%, #0f0f1a 100%);
     background-attachment: fixed;
   }
 
