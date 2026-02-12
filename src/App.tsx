@@ -22,6 +22,7 @@ const ReadMeter = lazy(() => import("./pages/ReadMeter"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const Success = lazy(() => import("./pages/Success"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Referrals = lazy(() => import("./pages/Referrals"));
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ function AppRoutes() {
         <Route path="/read" element={<ProtectedRoute><ReadMeter /></ProtectedRoute>} />
         <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
         <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+        <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
