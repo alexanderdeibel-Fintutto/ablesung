@@ -9,6 +9,7 @@ import { CascadeDeleteDialog } from '@/components/ui/cascade-delete-dialog';
 import { useBuildings } from '@/hooks/useBuildings';
 import { useProfile } from '@/hooks/useProfile';
 import { CrossMarketingBanner } from '@/components/dashboard/CrossMarketingBanner';
+import { FintuttoSuiteSection } from '@/components/dashboard/FintuttoSuiteSection';
 import { useProducts } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
 import { BuildingWithUnits } from '@/types/database';
@@ -248,6 +249,9 @@ export default function Dashboard() {
                 </Card>
               </motion.div>
             ))}
+
+          {/* Fintutto Suite Promo */}
+          <FintuttoSuiteSection />
 
           </motion.div>
         )}
