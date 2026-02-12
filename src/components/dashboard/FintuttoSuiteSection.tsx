@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, Wrench, Users, Calculator, ExternalLink, Copy, Check, Sparkles, Gift, TrendingUp, Share2 } from 'lucide-react';
+import { Building2, Wrench, Users, Calculator, Shield, ExternalLink, Copy, Check, Sparkles, Gift, TrendingUp, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useProducts, Product } from '@/hooks/useProducts';
 import { useReferrals } from '@/hooks/useReferrals';
@@ -37,9 +37,15 @@ const APP_META: Record<string, {
     url: 'https://ablesung.vercel.app',
     tagline: 'Nebenkostenabrechnung leicht gemacht',
   },
+  bescheidboxer: {
+    icon: Shield,
+    gradient: 'from-red-500 to-rose-600',
+    url: 'https://bescheidboxer.vercel.app',
+    tagline: 'KI-Widerspruch gegen falsche Bescheide',
+  },
 };
 
-const SUITE_APP_IDS = ['vermietify', 'hausmeister', 'mieter', 'nebenkosten'];
+const SUITE_APP_IDS = ['vermietify', 'hausmeister', 'mieter', 'nebenkosten', 'bescheidboxer'];
 
 function formatPrice(price: number): string {
   if (price === 0) return 'Kostenlos';
