@@ -18,6 +18,26 @@ serve(async (req) => {
   );
 
   try {
+    // Authenticate the caller
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Nicht autorisiert" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Nicht autorisiert" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const authenticatedUserId = userData.user.id;
+
     const { code, event, user_id, email } = await req.json();
 
     if (!code || !event) {
@@ -55,6 +75,22 @@ serve(async (req) => {
     const currentIndex = statusOrder.indexOf(referral.status);
     const newIndex = statusOrder.indexOf(event);
 
+    // Prevent self-referral
+    if (referral.referrer_id === authenticatedUserId) {
+      return new Response(JSON.stringify({ error: "Self-referral is not allowed" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
+    }
+
+    // For "subscribed" event, ensure user_id matches authenticated user
+    if (event === "subscribed" && user_id && user_id !== authenticatedUserId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
+    }
+
     // Only allow forward progression
     if (newIndex <= currentIndex) {
       return new Response(JSON.stringify({ 
@@ -70,7 +106,7 @@ serve(async (req) => {
     // Build update payload
     const updatePayload: Record<string, unknown> = { status: event };
     if (email) updatePayload.referred_email = email;
-    if (user_id) updatePayload.referred_user_id = user_id;
+    if (user_id) updatePayload.referred_user_id = user_id || authenticatedUserId;
     if (event === "subscribed") updatePayload.converted_at = new Date().toISOString();
 
     const { error: updateError } = await supabase
