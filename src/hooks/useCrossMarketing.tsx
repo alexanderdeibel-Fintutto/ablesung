@@ -1,6 +1,20 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+
+function useRotatingIndex(count: number, intervalMs: number) {
+  const [index, setIndex] = useState(0);
+  const safeCount = Math.max(count, 1);
+
+  useEffect(() => {
+    if (safeCount <= 1) return;
+    const id = setInterval(() => setIndex(prev => (prev + 1) % safeCount), intervalMs);
+    return () => clearInterval(id);
+  }, [safeCount, intervalMs]);
+
+  return index % safeCount;
+}
 
 export interface CrossSellTrigger {
   id: string;
@@ -68,8 +82,9 @@ export function useCrossMarketing() {
     trigger => !subscribedAppIds.has(trigger.target_app_id)
   );
 
-  // Get the highest priority trigger to display
-  const activeBanner = eligibleTriggers.length > 0 ? eligibleTriggers[0] : null;
+  // Rotate through triggers – change every 30 seconds based on timestamp
+  const rotationIndex = useRotatingIndex(eligibleTriggers.length, 30_000);
+  const activeBanner = eligibleTriggers.length > 0 ? eligibleTriggers[rotationIndex] : null;
 
   return {
     activeBanner,

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Building2, Calculator, Wrench, ExternalLink, Sparkles } from 'lucide-react';
+import { X, Building2, Calculator, Wrench, Users, ExternalLink, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCrossMarketing, CrossSellTrigger } from '@/hooks/useCrossMarketing';
 
@@ -8,12 +8,20 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Building2,
   Calculator,
   Wrench,
+  Users,
   Sparkles,
 };
 
 interface CrossMarketingBannerProps {
   className?: string;
 }
+
+const TARGET_URLS: Record<string, string> = {
+  vermietify: 'https://vermietify.vercel.app',
+  hausmeister: 'https://hausmeister-pro.vercel.app',
+  mieter: 'https://mieter-kw8d.vercel.app',
+  nebenkosten: 'https://ablesung.vercel.app',
+};
 
 export function CrossMarketingBanner({ className }: CrossMarketingBannerProps) {
   const { activeBanner, isLoading } = useCrossMarketing();
@@ -37,8 +45,9 @@ export function CrossMarketingBanner({ className }: CrossMarketingBannerProps) {
   const gradientClass = activeBanner.background_gradient || 'from-primary to-primary/80';
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       <motion.div
+        key={activeBanner.id}
         initial={{ opacity: 0, y: -20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -102,9 +111,8 @@ export function CrossMarketingBanner({ className }: CrossMarketingBannerProps) {
                   variant="secondary"
                   className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm font-medium"
                   onClick={() => {
-                    if (activeBanner.cta_url) {
-                      window.open(activeBanner.cta_url, '_blank');
-                    }
+                    const url = activeBanner.cta_url || TARGET_URLS[activeBanner.target_app_id];
+                    if (url) window.open(url, '_blank');
                   }}
                 >
                   {activeBanner.cta_text}
