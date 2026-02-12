@@ -592,6 +592,89 @@ export type Database = {
           },
         ]
       }
+      referral_rewards: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          is_redeemed: boolean
+          redeemed_at: string | null
+          referral_id: string
+          reward_type: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          is_redeemed?: boolean
+          redeemed_at?: string | null
+          referral_id: string
+          reward_type?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          is_redeemed?: boolean
+          redeemed_at?: string | null
+          referral_id?: string
+          reward_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_rewards_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_email: string | null
+          referred_user_id: string | null
+          referrer_id: string
+          status: string
+          target_app_id: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id: string
+          status?: string
+          target_app_id: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_email?: string | null
+          referred_user_id?: string | null
+          referrer_id?: string
+          status?: string
+          target_app_id?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           assigned_to: string | null
@@ -790,6 +873,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_referral_code: {
+        Args: { p_app_id: string; p_user_id: string }
+        Returns: string
+      }
       get_user_org_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
