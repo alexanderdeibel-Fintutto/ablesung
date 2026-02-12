@@ -1,80 +1,21 @@
 // Stripe Pricing Configuration
-// Product and price IDs from Stripe dashboard
+// Now driven by Supabase `products` table - this file only provides types and helpers
 
-export type PlanId = 'free' | 'basic' | 'pro' | 'business';
+export type PlanId = string; // e.g. 'free', 'basic', 'pro', 'business' or product name
 
 export interface PricingPlan {
-  id: PlanId;
+  id: string;
+  appId: string;
   name: string;
   description: string;
   priceMonthly: number;
   priceYearly: number;
   priceIdMonthly: string | null;
   priceIdYearly: string | null;
-  productId: string | null;
   features: string[];
   highlighted?: boolean;
+  sortOrder: number;
 }
-
-export const PRICING_PLANS: PricingPlan[] = [
-  {
-    id: 'free',
-    name: 'Starter',
-    description: 'Für den Einstieg',
-    priceMonthly: 0,
-    priceYearly: 0,
-    priceIdMonthly: null,
-    priceIdYearly: null,
-    productId: null,
-    features: [
-      'Bis zu 3 Einheiten',
-      'Manuelle Zählererfassung',
-      'Grundlegende Berichte',
-    ],
-  },
-  {
-    id: 'basic',
-    name: 'Basic',
-    description: 'Für kleine Vermieter',
-    priceMonthly: 9.99,
-    priceYearly: 99.90,
-    priceIdMonthly: 'price_1Stgdi52lqSgjCzewNmCKWqy',
-    priceIdYearly: 'price_1Stgdi52lqSgjCzewNmCKWqy',
-    productId: null,
-    features: [
-      'Bis zu 10 Einheiten',
-      'OCR-Zählererfassung',
-      'E-Mail Support',
-      'Erweiterte Berichte',
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    description: 'Für professionelle Vermieter',
-    priceMonthly: 24.99,
-    priceYearly: 249.90,
-    priceIdMonthly: 'price_1StgdM52lqSgjCzelgTZIRGu',
-    priceIdYearly: 'price_1StgdM52lqSgjCzelgTZIRGu',
-    productId: null,
-    features: [
-      'Bis zu 50 Einheiten',
-      'OCR-Zählererfassung',
-      'Prioritäts-Support',
-      'Automatische Nebenkostenabrechnung',
-      'Dokumentenverwaltung',
-    ],
-    highlighted: true,
-  },
-];
-
-export const getPlanById = (planId: PlanId): PricingPlan | undefined => {
-  return PRICING_PLANS.find(plan => plan.id === planId);
-};
-
-export const getPlanByProductId = (productId: string): PricingPlan | undefined => {
-  return PRICING_PLANS.find(plan => plan.productId === productId);
-};
 
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat('de-DE', {
@@ -82,3 +23,29 @@ export const formatPrice = (price: number): string => {
     currency: 'EUR',
   }).format(price);
 };
+
+/** Convert a DB product row to a PricingPlan */
+export const productToPricingPlan = (p: {
+  id: string;
+  app_id: string;
+  name: string;
+  description: string | null;
+  price_monthly: number;
+  price_yearly: number;
+  stripe_price_id_monthly: string | null;
+  stripe_price_id_yearly: string | null;
+  features: any;
+  sort_order: number | null;
+}): PricingPlan => ({
+  id: p.id,
+  appId: p.app_id,
+  name: p.name,
+  description: p.description || '',
+  priceMonthly: p.price_monthly,
+  priceYearly: p.price_yearly,
+  priceIdMonthly: p.stripe_price_id_monthly,
+  priceIdYearly: p.stripe_price_id_yearly,
+  features: Array.isArray(p.features) ? p.features : [],
+  highlighted: (p.sort_order ?? 0) === 2, // second paid tier is highlighted
+  sortOrder: p.sort_order ?? 0,
+});

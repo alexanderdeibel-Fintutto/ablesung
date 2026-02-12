@@ -2,13 +2,13 @@ import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PricingPlan, formatPrice, PlanId } from '@/lib/stripe';
+import { PricingPlan, formatPrice } from '@/lib/stripe';
 import { cn } from '@/lib/utils';
 
 interface PricingCardProps {
   plan: PricingPlan;
   isYearly: boolean;
-  currentPlan: PlanId;
+  currentPlan: string;
   isLoading: boolean;
   onSelect: (priceId: string) => void;
 }
@@ -16,8 +16,8 @@ interface PricingCardProps {
 export function PricingCard({ plan, isYearly, currentPlan, isLoading, onSelect }: PricingCardProps) {
   const price = isYearly ? plan.priceYearly : plan.priceMonthly;
   const priceId = isYearly ? plan.priceIdYearly : plan.priceIdMonthly;
-  const isCurrentPlan = currentPlan === plan.id;
-  const isFree = plan.id === 'free';
+  const isCurrentPlan = currentPlan === plan.id || currentPlan === plan.name.toLowerCase();
+  const isFree = price === 0;
   
   const handleClick = () => {
     if (priceId && !isCurrentPlan && !isFree) {
@@ -80,7 +80,7 @@ export function PricingCard({ plan, isYearly, currentPlan, isLoading, onSelect }
         <Button
           className="w-full"
           variant={plan.highlighted ? 'default' : 'outline'}
-          disabled={isCurrentPlan || isFree || isLoading}
+          disabled={isCurrentPlan || isFree || isLoading || !priceId}
           onClick={handleClick}
         >
           {getButtonText()}
