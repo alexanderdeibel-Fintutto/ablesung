@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Building2, Calculator, Wrench, Users, ExternalLink, Sparkles } from 'lucide-react';
+import { X, Building2, Calculator, Wrench, Users, ExternalLink, Sparkles, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCrossMarketing, CrossSellTrigger } from '@/hooks/useCrossMarketing';
+import { useReferrals } from '@/hooks/useReferrals';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Building2,
@@ -25,6 +26,7 @@ const TARGET_URLS: Record<string, string> = {
 
 export function CrossMarketingBanner({ className }: CrossMarketingBannerProps) {
   const { activeBanner, isLoading } = useCrossMarketing();
+  const { stats, getReferralUrl, createReferral } = useReferrals();
   const [dismissed, setDismissed] = useState<string[]>([]);
 
   if (isLoading || !activeBanner || dismissed.includes(activeBanner.id)) {
@@ -110,14 +112,30 @@ export function CrossMarketingBanner({ className }: CrossMarketingBannerProps) {
                   size="sm"
                   variant="secondary"
                   className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm font-medium"
-                  onClick={() => {
+                  onClick={async () => {
                     const url = activeBanner.cta_url || TARGET_URLS[activeBanner.target_app_id];
-                    if (url) window.open(url, '_blank');
+                    if (url) {
+                      const referralUrl = getReferralUrl(activeBanner.target_app_id, url);
+                      try {
+                        await createReferral.mutateAsync(activeBanner.target_app_id);
+                      } catch { /* ignore */ }
+                      window.open(referralUrl, '_blank');
+                    }
                   }}
                 >
                   {activeBanner.cta_text}
                   <ExternalLink className="ml-2 h-3.5 w-3.5" />
                 </Button>
+
+                {stats.totalReferrals > 0 && (
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <Gift className="w-3 h-3 text-white/60" />
+                    <span className="text-white/60 text-[11px]">
+                      {stats.totalReferrals} Empfehlung{stats.totalReferrals !== 1 ? 'en' : ''}
+                      {stats.totalSaved > 0 && ` · ${stats.totalSaved.toFixed(2).replace('.', ',')} € gespart`}
+                    </span>
+                  </div>
+                )}
               </motion.div>
             </div>
           </div>
