@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.process-referral]
 verify_jwt = false
+
+[functions.sync-stripe-products]
+verify_jwt = false
