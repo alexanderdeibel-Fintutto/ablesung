@@ -83,7 +83,7 @@ export function useCrossMarketing() {
   );
 
   // Rotate through triggers – change every 30 seconds based on timestamp
-  const rotationIndex = useRotatingIndex(eligibleTriggers.length, 30_000);
+  const rotationIndex = useRotatingIndex(eligibleTriggers.length, 15_000);
   const activeBanner = eligibleTriggers.length > 0 ? eligibleTriggers[rotationIndex] : null;
 
   return {
