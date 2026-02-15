@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Camera, Loader2, Building2, ChevronRight, Gauge, Trash2 } from 'lucide-react';
+import { Plus, Camera, Loader2, Building2, ChevronRight, Gauge, Trash2, BarChart3, FileText, Lightbulb, Sun, AlertTriangle, CheckCircle2, Bell, Calculator, Calendar, ListChecks, Thermometer } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,9 @@ import { CrossMarketingBanner } from '@/components/dashboard/CrossMarketingBanne
 import { FintuttoSuiteSection } from '@/components/dashboard/FintuttoSuiteSection';
 import { useProducts } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
-import { BuildingWithUnits } from '@/types/database';
+import { BuildingWithUnits, getReadingStatus } from '@/types/database';
+import { useEnergyContracts } from '@/hooks/useEnergyContracts';
+import { QuickReadingWidget } from '@/components/dashboard/QuickReadingWidget';
 
 // Animation variants
 const containerVariants = {
@@ -41,6 +43,29 @@ export default function Dashboard() {
   
   // Preload products on app start for pricing page and cross-marketing
   useProducts('zaehler');
+  const { upcomingDeadlines } = useEnergyContracts();
+
+  // Compute KPIs from all meters across all buildings
+  const kpis = useMemo(() => {
+    const allMeters = [
+      ...buildings.flatMap(b => b.meters || []),
+      ...buildings.flatMap(b => b.units?.flatMap(u => u.meters) || []),
+    ];
+    const totalMeters = allMeters.length;
+    const totalReadings = allMeters.reduce((sum, m) => sum + m.readings.length, 0);
+
+    let overdue = 0;
+    let due = 0;
+    let ok = 0;
+    allMeters.forEach(m => {
+      const status = getReadingStatus(m.lastReading?.reading_date);
+      if (status === 'overdue') overdue++;
+      else if (status === 'due') due++;
+      else ok++;
+    });
+
+    return { totalMeters, totalReadings, overdue, due, ok };
+  }, [buildings]);
 
   const handleDeleteBuilding = async () => {
     if (!deleteBuildingData) return;
@@ -154,6 +179,112 @@ export default function Dashboard() {
           </Button>
         </motion.div>
       </motion.div>
+
+      {/* KPI Row */}
+      {kpis.totalMeters > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-3 gap-3 mb-6"
+        >
+          <Card className="glass-card border-0">
+            <CardContent className="p-3 text-center">
+              <p className="text-2xl font-bold text-primary">{kpis.totalMeters}</p>
+              <p className="text-xs text-muted-foreground">Zähler</p>
+            </CardContent>
+          </Card>
+          <Card className="glass-card border-0">
+            <CardContent className="p-3 text-center">
+              <p className="text-2xl font-bold text-foreground">{kpis.totalReadings}</p>
+              <p className="text-xs text-muted-foreground">Ablesungen</p>
+            </CardContent>
+          </Card>
+          <Card className="glass-card border-0">
+            <CardContent className="p-3 text-center">
+              {kpis.overdue > 0 ? (
+                <>
+                  <p className="text-2xl font-bold text-destructive">{kpis.overdue}</p>
+                  <p className="text-xs text-destructive">Überfällig</p>
+                </>
+              ) : kpis.due > 0 ? (
+                <>
+                  <p className="text-2xl font-bold text-amber-500">{kpis.due}</p>
+                  <p className="text-xs text-amber-500">Fällig</p>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  </div>
+                  <p className="text-xs text-green-600">Alles aktuell</p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* A.7: Quick Reading Widget for due/overdue meters */}
+      {kpis.totalMeters > 0 && <QuickReadingWidget />}
+
+      {/* Contract Deadline Alert */}
+      {upcomingDeadlines.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-6"
+        >
+          <Card className="border-amber-500/30 bg-amber-500/5 border">
+            <CardContent className="p-3 flex items-center gap-3 cursor-pointer" onClick={() => navigate('/contracts')}>
+              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                  {upcomingDeadlines.length} Wechseltermin{upcomingDeadlines.length > 1 ? 'e' : ''} bald fällig
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {upcomingDeadlines[0].providerName} – {upcomingDeadlines[0].daysUntilDeadline} Tage
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Feature Quick-Links */}
+      {kpis.totalMeters > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-4 gap-2 mb-6"
+        >
+          {[
+            { href: '/analysis', icon: BarChart3, label: 'Analyse', color: 'text-blue-500' },
+            { href: '/contracts', icon: FileText, label: 'Verträge', color: 'text-purple-500' },
+            { href: '/savings', icon: Lightbulb, label: 'Sparen', color: 'text-amber-500' },
+            { href: '/solar', icon: Sun, label: 'Solar', color: 'text-yellow-500' },
+            { href: '/alerts', icon: Bell, label: 'Alerts', color: 'text-red-500' },
+            { href: '/tariffs', icon: Calculator, label: 'Tarife', color: 'text-indigo-500' },
+            { href: '/schedule', icon: Calendar, label: 'Ableseplan', color: 'text-teal-500' },
+            { href: '/batch-scan', icon: ListChecks, label: 'Batch', color: 'text-orange-500' },
+          ].map(({ href, icon: Icon, label, color }) => (
+            <motion.div key={href} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Card
+                className="glass-card border-0 cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => navigate(href)}
+              >
+                <CardContent className="p-3 flex flex-col items-center gap-1">
+                  <Icon className={`w-5 h-5 ${color}`} />
+                  <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
 
       {/* Buildings Overview */}
       <AnimatePresence mode="wait">

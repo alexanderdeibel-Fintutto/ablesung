@@ -24,6 +24,35 @@ const Success = lazy(() => import("./pages/Success"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 
+// NEW: Feature pages
+const ConsumptionAnalysis = lazy(() => import("./pages/ConsumptionAnalysis"));
+const Contracts = lazy(() => import("./pages/Contracts"));
+const ProviderComparison = lazy(() => import("./pages/ProviderComparison"));
+const SavingsPotential = lazy(() => import("./pages/SavingsPotential"));
+const SolarDashboard = lazy(() => import("./pages/SolarDashboard"));
+const WeatherCorrelation = lazy(() => import("./pages/WeatherCorrelation"));
+const BKIntegration = lazy(() => import("./pages/BKIntegration"));
+
+// Phase B: Core feature pages
+const TariffManager = lazy(() => import("./pages/TariffManager"));
+const HeatPumpDashboard = lazy(() => import("./pages/HeatPumpDashboard"));
+const SmartAlerts = lazy(() => import("./pages/SmartAlerts"));
+const MeterSchedule = lazy(() => import("./pages/MeterSchedule"));
+const CostCalculation = lazy(() => import("./pages/CostCalculation"));
+const BatchScanner = lazy(() => import("./pages/BatchScanner"));
+
+// Phase C: Analysis & AI pages
+const ConsumptionHeatmap = lazy(() => import("./pages/ConsumptionHeatmap"));
+const SavingsSimulator = lazy(() => import("./pages/SavingsSimulator"));
+const EnergyChat = lazy(() => import("./pages/EnergyChat"));
+const EnergyFlow = lazy(() => import("./pages/EnergyFlow"));
+
+// Phase D: Reports & Export
+const ReportBuilder = lazy(() => import("./pages/ReportBuilder"));
+
+// Phase E: Utility Billing
+const UtilityBilling = lazy(() => import("./pages/UtilityBilling"));
+
 const queryClient = new QueryClient();
 
 function LoadingFallback() {
@@ -74,7 +103,7 @@ function AppRoutes() {
         <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
 
-        {/* Protected routes */}
+        {/* Protected routes - Core */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/buildings/new" element={<ProtectedRoute><BuildingNew /></ProtectedRoute>} />
         <Route path="/buildings/:id" element={<ProtectedRoute><BuildingDetail /></ProtectedRoute>} />
@@ -86,6 +115,35 @@ function AppRoutes() {
         <Route path="/pricing" element={<ProtectedRoute><Pricing /></ProtectedRoute>} />
         <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
         <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
+
+        {/* Protected routes - NEW Feature Pages */}
+        <Route path="/analysis" element={<ProtectedRoute><ConsumptionAnalysis /></ProtectedRoute>} />
+        <Route path="/contracts" element={<ProtectedRoute><Contracts /></ProtectedRoute>} />
+        <Route path="/comparison" element={<ProtectedRoute><ProviderComparison /></ProtectedRoute>} />
+        <Route path="/savings" element={<ProtectedRoute><SavingsPotential /></ProtectedRoute>} />
+        <Route path="/solar" element={<ProtectedRoute><SolarDashboard /></ProtectedRoute>} />
+        <Route path="/weather" element={<ProtectedRoute><WeatherCorrelation /></ProtectedRoute>} />
+        <Route path="/bk-integration" element={<ProtectedRoute><BKIntegration /></ProtectedRoute>} />
+
+        {/* Protected routes - Phase B Feature Pages */}
+        <Route path="/tariffs" element={<ProtectedRoute><TariffManager /></ProtectedRoute>} />
+        <Route path="/heat-pump" element={<ProtectedRoute><HeatPumpDashboard /></ProtectedRoute>} />
+        <Route path="/alerts" element={<ProtectedRoute><SmartAlerts /></ProtectedRoute>} />
+        <Route path="/schedule" element={<ProtectedRoute><MeterSchedule /></ProtectedRoute>} />
+        <Route path="/costs" element={<ProtectedRoute><CostCalculation /></ProtectedRoute>} />
+        <Route path="/batch-scan" element={<ProtectedRoute><BatchScanner /></ProtectedRoute>} />
+
+        {/* Protected routes - Phase C Analysis & AI */}
+        <Route path="/heatmap" element={<ProtectedRoute><ConsumptionHeatmap /></ProtectedRoute>} />
+        <Route path="/simulator" element={<ProtectedRoute><SavingsSimulator /></ProtectedRoute>} />
+        <Route path="/energy-chat" element={<ProtectedRoute><EnergyChat /></ProtectedRoute>} />
+        <Route path="/energy-flow" element={<ProtectedRoute><EnergyFlow /></ProtectedRoute>} />
+
+        {/* Protected routes - Phase D Reports */}
+        <Route path="/reports" element={<ProtectedRoute><ReportBuilder /></ProtectedRoute>} />
+
+        {/* Protected routes - Phase E Utility Billing */}
+        <Route path="/utility-billing" element={<ProtectedRoute><UtilityBilling /></ProtectedRoute>} />
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
