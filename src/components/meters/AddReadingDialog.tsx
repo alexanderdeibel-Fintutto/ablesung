@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Loader2, Plus } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Loader2, Plus, TrendingUp, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,7 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useBuildings } from '@/hooks/useBuildings';
 import { useToast } from '@/hooks/use-toast';
-import { METER_TYPE_UNITS, MeterType } from '@/types/database';
+import { METER_TYPE_UNITS, METER_TYPE_PRICE_DEFAULTS, MeterType, MeterReading, formatNumber, formatEuro, calculateCost } from '@/types/database';
 
 interface AddReadingDialogProps {
   open: boolean;
@@ -29,6 +30,7 @@ interface AddReadingDialogProps {
   meterId: string;
   meterType: MeterType;
   existingDates?: string[];
+  lastReading?: MeterReading;
 }
 
 export function AddReadingDialog({
@@ -37,6 +39,7 @@ export function AddReadingDialog({
   meterId,
   meterType,
   existingDates = [],
+  lastReading,
 }: AddReadingDialogProps) {
   const isMobile = useIsMobile();
   const { createReading } = useBuildings();
@@ -47,18 +50,44 @@ export function AddReadingDialog({
     new Date().toISOString().split('T')[0]
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [allowOverflow, setAllowOverflow] = useState(false);
 
   const isDuplicate = existingDates.includes(readingDate);
+  const parsedValue = parseFloat(readingValue.replace(',', '.'));
+  const isValidNumber = !isNaN(parsedValue) && readingValue.trim() !== '';
+
+  // Live consumption calculation
+  const liveConsumption = useMemo(() => {
+    if (!isValidNumber || !lastReading) return null;
+    const diff = parsedValue - lastReading.reading_value;
+    return diff;
+  }, [parsedValue, lastReading, isValidNumber]);
+
+  const liveCost = useMemo(() => {
+    if (liveConsumption === null || liveConsumption <= 0) return null;
+    return calculateCost(liveConsumption, meterType);
+  }, [liveConsumption, meterType]);
+
+  // Validation: new value should be >= last value (unless overflow/meter reset)
+  const isValueTooLow = isValidNumber && lastReading && parsedValue < lastReading.reading_value && !allowOverflow;
 
   const handleSubmit = async () => {
     if (!readingValue.trim()) return;
 
-    const value = parseFloat(readingValue.replace(',', '.'));
-    if (isNaN(value)) {
+    if (!isValidNumber) {
       toast({
         variant: 'destructive',
         title: 'Ungültiger Wert',
         description: 'Bitte geben Sie eine gültige Zahl ein.',
+      });
+      return;
+    }
+
+    if (isValueTooLow) {
+      toast({
+        variant: 'destructive',
+        title: 'Wert zu niedrig',
+        description: 'Der neue Stand ist niedriger als der letzte. Aktivieren Sie "Zählerüberlauf" falls der Zähler zurückgesetzt wurde.',
       });
       return;
     }
@@ -68,19 +97,22 @@ export function AddReadingDialog({
     try {
       await createReading.mutateAsync({
         meter_id: meterId,
-        reading_value: value,
+        reading_value: parsedValue,
         reading_date: readingDate,
         source: 'manual',
       });
 
       toast({
         title: 'Ablesung hinzugefügt',
-        description: 'Der Zählerstand wurde erfolgreich gespeichert.',
+        description: liveConsumption !== null && liveConsumption > 0
+          ? `Stand gespeichert. Verbrauch: ${formatNumber(liveConsumption)} ${METER_TYPE_UNITS[meterType]}`
+          : 'Der Zählerstand wurde erfolgreich gespeichert.',
       });
 
       onOpenChange(false);
       setReadingValue('');
       setReadingDate(new Date().toISOString().split('T')[0]);
+      setAllowOverflow(false);
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -104,7 +136,7 @@ export function AddReadingDialog({
         />
         {isDuplicate && (
           <p className="text-sm text-amber-600">
-            ⚠️ Es existiert bereits eine Ablesung für dieses Datum. Diese wird überschrieben.
+            Es existiert bereits eine Ablesung für dieses Datum. Diese wird überschrieben.
           </p>
         )}
       </div>
@@ -117,11 +149,55 @@ export function AddReadingDialog({
           id="readingValue"
           type="text"
           inputMode="decimal"
-          placeholder="z.B. 12345,67"
+          placeholder={lastReading ? `Letzter Stand: ${formatNumber(lastReading.reading_value)}` : 'z.B. 12345,67'}
           value={readingValue}
           onChange={(e) => setReadingValue(e.target.value)}
+          className={isValueTooLow ? 'border-destructive' : ''}
         />
+        {lastReading && (
+          <p className="text-xs text-muted-foreground">
+            Letzter Stand: {formatNumber(lastReading.reading_value)} {METER_TYPE_UNITS[meterType]}
+          </p>
+        )}
       </div>
+
+      {/* Live consumption display */}
+      {liveConsumption !== null && liveConsumption > 0 && (
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-primary">
+            <TrendingUp className="w-4 h-4" />
+            Verbrauch seit letzter Ablesung
+          </div>
+          <div className="mt-1 flex justify-between items-baseline">
+            <span className="text-lg font-bold text-primary">
+              {formatNumber(liveConsumption)} {METER_TYPE_UNITS[meterType]}
+            </span>
+            {liveCost !== null && (
+              <span className="text-sm text-muted-foreground">
+                ~ {formatEuro(liveCost)}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Value too low warning */}
+      {isValueTooLow && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 space-y-2">
+          <div className="flex items-center gap-2 text-sm font-medium text-destructive">
+            <AlertTriangle className="w-4 h-4" />
+            Wert ist niedriger als letzter Stand
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Der eingegebene Wert ({formatNumber(parsedValue)}) ist niedriger als der letzte Stand ({formatNumber(lastReading!.reading_value)}).
+            Bei einem Zählerreset oder -wechsel können Sie den Überlauf-Modus aktivieren.
+          </p>
+          <div className="flex items-center gap-2">
+            <Switch checked={allowOverflow} onCheckedChange={setAllowOverflow} />
+            <Label className="text-sm">Zählerüberlauf / Reset erlauben</Label>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -136,7 +212,7 @@ export function AddReadingDialog({
           <DrawerFooter>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || !readingValue.trim()}
+              disabled={isSubmitting || !readingValue.trim() || (isValueTooLow ?? false)}
             >
               {isSubmitting ? (
                 <>
@@ -172,7 +248,7 @@ export function AddReadingDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={isSubmitting || !readingValue.trim()}
+            disabled={isSubmitting || !readingValue.trim() || (isValueTooLow ?? false)}
           >
             {isSubmitting ? (
               <>

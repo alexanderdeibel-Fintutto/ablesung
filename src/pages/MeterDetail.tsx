@@ -440,6 +440,7 @@ export default function MeterDetail() {
         meterId={meter.id}
         meterType={meter.meter_type}
         existingDates={existingDates}
+        lastReading={meter.lastReading || undefined}
       />
 
       {/* Import Wizard */}

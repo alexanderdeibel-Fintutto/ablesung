@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { useBuildings } from '@/hooks/useBuildings';
 import { useToast } from '@/hooks/use-toast';
-import { MeterType, METER_TYPE_LABELS } from '@/types/database';
+import { MeterType, METER_TYPE_LABELS, METER_TYPE_GROUPS } from '@/types/database';
 import { MeterNumberScanner, DetectedReading, MeterEra } from './MeterNumberScanner';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -49,10 +49,34 @@ export function AddMeterDialog({ open, onOpenChange, buildingId }: AddMeterDialo
       } else {
         setMeterType('water_cold');
       }
+    } else if (/pv|solar|photo|einspe/.test(nameLower)) {
+      if (/einspe|feed/.test(nameLower)) setMeterType('pv_feed_in');
+      else if (/eigen|self/.test(nameLower)) setMeterType('pv_self_consumption');
+      else setMeterType('pv_production');
+    } else if (/wärmepumpe|heat.?pump/.test(nameLower)) {
+      setMeterType('heat_pump');
+    } else if (/e.?auto|lad|charg|wallbox/.test(nameLower)) {
+      setMeterType('ev_charging');
+    } else if (/fernwärme|district/.test(nameLower)) {
+      setMeterType('district_heating');
+    } else if (/allgemein|common|treppenhaus|aufzug/.test(nameLower)) {
+      setMeterType('electricity_common');
+    } else if (/ht|hochtarif/.test(nameLower)) {
+      setMeterType('electricity_ht');
+    } else if (/nt|niedertarif|nacht/.test(nameLower)) {
+      setMeterType('electricity_nt');
     } else if (/strom|electri|kwh/.test(nameLower)) {
       setMeterType('electricity');
+    } else if (/öl|oil|heizöl/.test(nameLower)) {
+      setMeterType('oil');
+    } else if (/pellet/.test(nameLower)) {
+      setMeterType('pellets');
+    } else if (/flüssiggas|lpg|propan/.test(nameLower)) {
+      setMeterType('lpg');
     } else if (/gas/.test(nameLower)) {
       setMeterType('gas');
+    } else if (/kühl|cool|klima/.test(nameLower)) {
+      setMeterType('cooling');
     } else if (/heiz|heat/.test(nameLower)) {
       setMeterType('heating');
     }
@@ -216,10 +240,17 @@ export function AddMeterDialog({ open, onOpenChange, buildingId }: AddMeterDialo
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(METER_TYPE_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
+                {Object.entries(METER_TYPE_GROUPS).map(([groupKey, group]) => (
+                  <div key={groupKey}>
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                      {group.label}
+                    </div>
+                    {group.types.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {METER_TYPE_LABELS[type]}
+                      </SelectItem>
+                    ))}
+                  </div>
                 ))}
               </SelectContent>
             </Select>
